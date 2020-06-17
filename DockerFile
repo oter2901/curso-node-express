@@ -1,0 +1,8 @@
+FROM node:14-alpine
+
+WORKDIR /usr/src/app
+ADD ./package*.json ./
+RUN npm i
+ADD . .
+
+CMD ["npm", "run", "start"]

@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+
+const http = require('http');
+const displayRoutes = require('express-routemap');
+const dotenv = require('dotenv');
+const app = require('../app');
+dotenv.config();
+
+const { env } = process;
+
+function normalizePort(value) {
+  const port = parseInt(value, 10);
+  if (typeof port !== 'number') return value;
+  if (port > 0) return port;
+  return false;
+}
+
+const port = normalizePort(env.PORT || 8080);
+
+app.set('port', port);
+
+const server = http.createServer(app);
+
+async function initialize() {
+  try {
+    console.log(
+      `\x1b[33m starting  the microservice [ ${
+        process.env.APP_ID
+      } ]. at ${Date().toString()}`
+    );
+
+    console.log(`\x1b[34m Listening on port ${port}`);
+    console.log(
+      `\x1b[32m Running environment NODE_ENV=${
+        process.env.NODE_ENV || 'development'
+      }`
+    );
+    displayRoutes(app);
+  } catch (err) {
+    throw errr;
+  }
+}
+
+app.listen(port, initialize);
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  const bind = typeof port === 'string' ? `Pipe ${port}` : `Port ${port}`;
+  switch (error.code) {
+    case 'EACCES':
+      console.error(`${bind} requires elevated privileges`);
+      process.exit(1);
+      break;
+
+    case 'EADDRINUSE':
+      console.error(`${bind} is already in use`);
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+server.on('error', onError);
+
+exports.closeServer = function () {
+  server.close();
+};
